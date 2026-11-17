@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#fff0f3">
+  <title>Happy Birthday, Princess! ✨💖</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Great+Vibes&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Ambient Background & Particle Canvases -->
+  <div class="app-background"></div>
+  <canvas id="particle-canvas"></canvas>
+  <canvas id="confetti-canvas"></canvas>
+
+  <div class="app-container">
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="top-nav">
+      <div class="top-brand">
+        <span class="brand-icon">👑</span>
+        <span class="brand-title" id="brand-name-display">Princess's Day</span>
+      </div>
+
+      <div class="nav-controls">
+        <!-- Web Audio Melody Toggle -->
+        <button id="music-toggle-btn" class="icon-btn music-btn" title="Toggle Romantic Birthday Music" aria-label="Toggle Birthday Melody">
+          <div class="music-bars">
+            <span class="music-bar"></span>
+            <span class="music-bar"></span>
+            <span class="music-bar"></span>
+            <span class="music-bar"></span>
+          </div>
+        </button>
+
+        <!-- Personalize / Settings Button -->
+        <button id="settings-btn" class="icon-btn" title="Personalize Her Birthday Details" aria-label="Settings">
+          ⚙️
+        </button>
+      </div>
+    </header>
+
+    <!-- ======================================================================
+         GATE / LOGIN SCREEN (Passcode with Month, Day, Year)
+         ====================================================================== -->
+    <main id="gate-screen" class="gate-screen">
+      <div class="gate-card">
+        <div class="tiara-badge">✨👑✨</div>
+        <h1 class="gate-title">
+          A Secret Realm
+          <span>For My Favorite Girl</span>
+        </h1>
+        <p class="gate-subtitle">
+          Please verify your royal presence by entering your special birthday date below 💖
+        </p>
+
+        <form class="date-lock-form" onsubmit="event.preventDefault(); app.verifyBirthday();">
+          <div class="date-pickers">
+            <div class="picker-col">
+              <label for="select-month">Month</label>
+              <select id="select-month" class="picker-select" aria-label="Select Birth Month"></select>
+            </div>
+            <div class="picker-col">
+              <label for="select-day">Day</label>
+              <select id="select-day" class="picker-select" aria-label="Select Birth Day"></select>
+            </div>
+            <div class="picker-col">
+              <label for="select-year">Year</label>
+              <select id="select-year" class="picker-select" aria-label="Select Birth Year"></select>
+            </div>
+          </div>
+
+          <button type="submit" id="unlock-gate-btn" class="unlock-btn">
+            <span>✨ Unlock Birthday Vault</span>
+          </button>
+        </form>
+
+        <div id="gate-msg" class="gate-msg"></div>
+
+        <div class="gate-hint">
+          <button id="hint-btn" class="hint-link">💡 Need a clue?</button>
+          <span>•</span>
+          <button id="preview-bypass-btn" class="hint-link">🚀 Quick Preview Unlock</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- ======================================================================
+         MAIN APP CONTENT (Revealed After Birthday Login)
+         ====================================================================== -->
+    <main id="main-app" class="main-app">
+
+      <!-- Celebration Progress Checklist -->
+      <section class="progress-card">
+        <div class="progress-header">
+          <span class="progress-title">🎂 Her Birthday Magic Tracker</span>
+          <span id="progress-pct" class="progress-pct">25% Complete</span>
+        </div>
+        <div class="progress-bar-track">
+          <div id="progress-bar-fill" class="progress-bar-fill"></div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           TAB 1: ROYAL GREETING & LOVE LETTER
+           ==================================================================== -->
+      <section id="tab-greeting" class="section-tab active-tab">
+        <div class="hero-greeting">
+          <div class="crown-wrapper">👑</div>
+          <h2 class="hero-title">Happy Birthday to</h2>
+          <span id="hero-name-display" class="hero-name">My Birthday Queen</span>
+          <p class="hero-tagline">
+            To the girl whose presence makes every single second sweeter, warmer, and endlessly brighter.
+          </p>
+        </div>
+
+        <!-- Wax Sealed Envelope -->
+        <div class="envelope-container">
+          <div class="envelope-wrapper">
+            <!-- Wax Seal Button -->
+            <div id="wax-seal-wrapper" class="wax-seal-wrapper">
+              <div class="wax-seal">💌</div>
+              <div class="seal-prompt">Break the Wax Seal</div>
+              <div class="seal-subtext">Tap to open your personalized letter</div>
+            </div>
+
+            <!-- Letter Paper (Unfolds on click) -->
+            <article id="letter-paper" class="letter-paper">
+              <h3 id="letter-greeting-display" class="letter-greeting">Dearest Birthday Princess,</h3>
+              <p id="letter-body-display" class="letter-body"></p>
+              <div id="letter-sig-display" class="letter-signature">Forever yours, with all my heart ❤️</div>
+              <button id="letter-replay-btn" class="letter-replay-btn">
+                <span>🔄 Read again</span>
+              </button>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           TAB 2: BIRTHDAY CAKE & MAKE A WISH
+           ==================================================================== -->
+      <section id="tab-cake" class="section-tab">
+        <div class="cake-stage">
+          <span class="section-badge">✨ Special Moment ✨</span>
+          <h2 class="cake-title">Make a Secret Wish</h2>
+          <p class="cake-subtitle">Close your eyes, whisper your deepest dream, and blow out your candles 🕯️</p>
+
+          <div class="cake-display-card">
+            <div class="cake-container">
+              <!-- Glowing Animated Candles -->
+              <div class="candles-row">
+                <div class="candle" onclick="this.classList.toggle('blown')">
+                  <div class="candle-flame"></div>
+                  <div class="smoke-puff"></div>
+                </div>
+                <div class="candle" onclick="this.classList.toggle('blown')">
+                  <div class="candle-flame"></div>
+                  <div class="smoke-puff"></div>
+                </div>
+                <div class="candle" onclick="this.classList.toggle('blown')">
+                  <div class="candle-flame"></div>
+                  <div class="smoke-puff"></div>
+                </div>
+              </div>
+
+              <!-- Top Tier -->
+              <div class="cake-top-tier">
+                <div class="strawberries">
+                  <span>🍓</span><span>🍓</span><span>🍓</span>
+                </div>
+              </div>
+
+              <!-- Bottom Tier -->
+              <div class="cake-bottom-tier">
+                <div class="frosting-drips"></div>
+              </div>
+
+              <!-- Cake Stand -->
+              <div class="cake-stand"></div>
+              <div class="cake-stand-base"></div>
+            </div>
+
+            <div class="wish-action-area">
+              <button id="blow-candles-btn" class="blow-candles-btn">
+                <span>🌬️ Blow Out the Candles!</span>
+              </button>
+            </div>
+
+            <div id="wish-revealed-card" class="wish-revealed-card">
+              <h4>✨ Your Wish is Floating to the Stars! ✨</h4>
+              <p>May every single dream you hold close to your heart bloom into breathtaking reality this year.</p>
+              <button id="relight-btn" style="background:none; border:none; color:var(--primary); font-size:0.8rem; margin-top:8px; cursor:pointer;">
+                🕯️ Relight candles for another wish
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Song dock: loaded invisibly on the gate, starts automatically on unlock -->
+    <div id="song-dock" class="song-dock">
+      <div id="spotify-embed"></div>
+    </div>
+
+    <!-- ======================================================================
+         BOTTOM NAVIGATION BAR (3 Clean, Balanced Tabs)
+         ====================================================================== -->
+    <nav class="bottom-nav">
+      <button class="nav-tab-btn active" data-tab="tab-greeting" aria-label="Greeting Tab">
+        <span class="tab-icon">💌</span>
+        <span class="tab-label">Greeting</span>
+      </button>
+
+      <button class="nav-tab-btn" data-tab="tab-cake" aria-label="Cake Tab">
+        <span class="tab-icon">🎂</span>
+        <span class="tab-label">The Cake</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- ======================================================================
+       SETTINGS & PERSONALIZATION MODAL
+       ====================================================================== -->
+  <div id="settings-modal" class="modal-overlay">
+    <div class="modal-dialog">
+      <button id="modal-close-btn" class="modal-close-btn" aria-label="Close Settings">✕</button>
+      <h3 class="modal-title">Personalize Her Experience ✨</h3>
+      <p class="modal-desc">
+        Set her exact name, birthday date for the login gate, and customize your special love letter. Everything is saved automatically!
+      </p>
+
+      <form id="settings-form" onsubmit="event.preventDefault();">
+        <div class="form-group">
+          <label for="set-name-input">Her Name / Pet Name</label>
+          <input type="text" id="set-name-input" class="form-input" placeholder="e.g. My Princess, Sophia, Angel">
+        </div>
+
+        <div class="form-group">
+          <label>Her Birthday Date (The Secret Login Key)</label>
+          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px;">
+            <input type="number" id="set-month-input" class="form-input" min="1" max="12" placeholder="Month (1-12)">
+            <input type="number" id="set-day-input" class="form-input" min="1" max="31" placeholder="Day (1-31)">
+            <input type="number" id="set-year-input" class="form-input" min="1990" max="2026" placeholder="Year">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="set-letter-input">Personalized Love Letter</label>
+          <textarea id="set-letter-input" class="form-textarea" rows="6" placeholder="Write your heartfelt message here..."></textarea>
+        </div>
+
+        <button type="button" id="save-settings-btn" class="form-save-btn">
+          💾 Save & Update Application
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- GHOST JUMP-SCARE (appears when the song finishes) -->
+  <div id="ghost-overlay" class="ghost-overlay" aria-hidden="true">
+    <div class="ghost-fog"></div>
+    <svg class="ghost-svg" viewBox="0 0 300 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A scary but silly ghost">
+      <defs>
+        <radialGradient id="gbody" cx="50%" cy="35%" r="70%">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="70%" stop-color="#cfd8e3"/>
+          <stop offset="100%" stop-color="#7d8ba0"/>
+        </radialGradient>
+        <radialGradient id="geye" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ff1a1a"/>
+          <stop offset="45%" stop-color="#5a0000"/>
+          <stop offset="100%" stop-color="#000"/>
+        </radialGradient>
+      </defs>
+      <path d="M40 360 L40 150 C40 60 100 15 150 15 C200 15 260 60 260 150 L260 360 L228 322 L196 362 L164 322 L132 362 L100 322 L70 362 Z" fill="url(#gbody)" stroke="#3a4558" stroke-width="3"/>
+      <path d="M40 200 C5 215 0 255 20 290" fill="none" stroke="#7d8ba0" stroke-width="14" stroke-linecap="round"/>
+      <path d="M260 200 C295 215 300 255 280 290" fill="none" stroke="#7d8ba0" stroke-width="14" stroke-linecap="round"/>
+      <ellipse cx="108" cy="130" rx="30" ry="40" fill="url(#geye)"/>
+      <ellipse cx="192" cy="130" rx="30" ry="40" fill="url(#geye)"/>
+      <circle class="ghost-pupil" cx="108" cy="135" r="7" fill="#fff"/>
+      <circle class="ghost-pupil" cx="192" cy="135" r="7" fill="#fff"/>
+      <path d="M70 95 L135 112" stroke="#222" stroke-width="7" stroke-linecap="round"/>
+      <path d="M230 95 L165 112" stroke="#222" stroke-width="7" stroke-linecap="round"/>
+      <path d="M72 205 Q150 330 228 205 Q150 235 72 205 Z" fill="#150005" stroke="#222" stroke-width="3"/>
+      <path d="M85 211 L98 238 L111 218 L124 246 L137 222 L150 250 L163 222 L176 246 L189 218 L202 238 L215 211 Z" fill="#fff"/>
+      <path d="M140 256 Q150 300 160 256 Q150 272 140 256 Z" fill="#c2185b"/>
+    </svg>
+    <div class="ghost-boo">BOOOO! 👻</div>
+    <div class="ghost-sub">Gotcha! Happy Birthday, you brave soul 🎂💖</div>
+    <button id="ghost-close-btn" class="ghost-close-btn">Phew... close 😅</button>
+  </div>
+
+  <script src="app.js"></script>
+  <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
+</body>
+</html>
